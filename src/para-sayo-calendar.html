@@ -1,0 +1,616 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>One letter a day</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Special+Elite&family=Homemade+Apple&family=EB+Garamond:ital,wght@0,400;0,500;1,400&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --kraft: #E6DBF7;
+    --kraft-dark: #CBB6EC;
+    --kraft-darker: #B39FE0;
+    --cream: #FDFBFF;
+    --cream-2: #FFFDFF;
+    --ink: #4E3E72;
+    --ink-soft: #8577A8;
+    --airmail-red: #E3A6D6;
+    --airmail-blue: #8971CE;
+    --gold: #F0C2E0;
+    --gold-light:#FBE6F5;
+  }
+
+  *{ box-sizing:border-box; }
+
+  body{
+    margin:0;
+    min-height:100vh;
+    background:
+      radial-gradient(ellipse at top left, rgba(255,255,255,0.08), transparent 60%),
+      repeating-linear-gradient(135deg, rgba(0,0,0,0.015) 0 2px, transparent 2px 6px),
+      var(--kraft);
+    color: var(--ink);
+    font-family: 'EB Garamond', serif;
+    padding: 40px 16px 80px;
+  }
+
+  .wrap{ max-width: 980px; margin: 0 auto; }
+
+  header{
+    text-align:center;
+    margin-bottom: 46px;
+  }
+
+  .eyebrow{
+    font-family:'Special Elite', monospace;
+    letter-spacing: 3px;
+    text-transform: uppercase;
+    font-size: 12px;
+    color: var(--ink-soft);
+    display:inline-block;
+    padding: 4px 14px;
+    border: 1px solid var(--kraft-darker);
+    border-radius: 20px;
+    margin-bottom: 18px;
+    background: rgba(255,255,255,0.25);
+  }
+
+  h1{
+    font-family:'Homemade Apple', cursive;
+    font-weight:400;
+    font-size: clamp(38px, 7vw, 64px);
+    margin: 0 0 8px;
+    color: var(--airmail-blue);
+    line-height:1.1;
+  }
+
+  .subtitle{
+    font-family:'EB Garamond', serif;
+    font-style: italic;
+    font-size: 19px;
+    color: var(--ink-soft);
+    margin: 0 0 22px;
+  }
+
+  .countdown{
+    font-family:'Special Elite', monospace;
+    font-size: 13px;
+    letter-spacing: 1px;
+    color: var(--cream-2);
+    background: var(--airmail-blue);
+    display:inline-flex;
+    align-items:center;
+    gap: 10px;
+    padding: 10px 20px;
+    border-radius: 3px;
+    box-shadow: 0 3px 0 rgba(0,0,0,0.15), 0 6px 14px rgba(0,0,0,0.2);
+  }
+  .countdown b{ color: var(--gold-light); font-size:15px; }
+
+  .album{
+    background: linear-gradient(180deg, rgba(255,255,255,0.35), rgba(255,255,255,0.1));
+    border: 1px solid rgba(0,0,0,0.08);
+    border-radius: 6px;
+    padding: 28px;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.4), 0 10px 30px rgba(60,40,20,0.15);
+  }
+
+  .grid{
+    display:grid;
+    grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+    gap: 18px;
+  }
+
+  .stamp{
+    position:relative;
+    aspect-ratio: 4/5;
+    background: var(--cream-2);
+    border: 3px dotted var(--kraft-darker);
+    border-radius: 3px;
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    justify-content:center;
+    cursor: pointer;
+    padding: 10px 6px;
+    transition: transform .18s ease, box-shadow .18s ease;
+    font-family:'Special Elite', monospace;
+  }
+
+  .stamp.unlocked:hover{
+    transform: translateY(-4px) rotate(-1deg);
+    box-shadow: 0 10px 18px rgba(60,40,20,0.28);
+  }
+
+  .stamp.locked{
+    background: repeating-linear-gradient(45deg, #D6C4F0, #D6C4F0 6px, #C7B0EA 6px, #C7B0EA 12px);
+    border-color: rgba(0,0,0,0.15);
+    cursor: default;
+    color: rgba(255,255,255,0.85);
+  }
+
+  .stamp .day-num{
+    font-size: 26px;
+    color: var(--airmail-blue);
+    line-height:1;
+  }
+  .stamp.locked .day-num{ color: rgba(255,255,255,0.9); }
+
+  .stamp .day-date{
+    font-size: 10px;
+    color: var(--ink-soft);
+    margin-top:4px;
+    letter-spacing:0.5px;
+  }
+  .stamp.locked .day-date{ color: rgba(255,255,255,0.75); }
+
+  .stamp.today{
+    border-color: var(--airmail-red);
+    box-shadow: 0 0 0 3px rgba(179,58,58,0.18);
+  }
+  .stamp.today::after{
+    content:"TODAY";
+    position:absolute;
+    top:-9px;
+    left:50%;
+    transform:translateX(-50%);
+    background: var(--airmail-red);
+    color:#fff;
+    font-size:8px;
+    letter-spacing:1px;
+    padding:2px 6px;
+    border-radius:8px;
+  }
+
+  .lock-icon{ font-size:18px; opacity:0.8; }
+
+  .stamp.unlocked .corner{
+    position:absolute; width:8px; height:8px;
+    border-radius:50%;
+    background: var(--kraft);
+    box-shadow: 0 0 0 1px var(--kraft-darker) inset;
+  }
+  .c-tl{ top:-7px; left:-7px; } .c-tr{ top:-7px; right:-7px; }
+  .c-bl{ bottom:-7px; left:-7px; } .c-br{ bottom:-7px; right:-7px; }
+
+  .final-day{ position:relative; }
+  .final-day.unlocked{ background: linear-gradient(160deg, #FBEAFB, var(--cream-2)); }
+  .final-day .day-num{ color: var(--airmail-red); }
+
+  footer.note{
+    text-align:center;
+    margin-top: 34px;
+    font-family:'EB Garamond', serif;
+    font-style: italic;
+    color: var(--ink-soft);
+    font-size: 15px;
+  }
+
+  .overlay{
+    position:fixed; inset:0;
+    background: rgba(20,14,8,0.55);
+    display:none;
+    align-items:center;
+    justify-content:center;
+    z-index: 100;
+    padding: 20px;
+  }
+  .overlay.show{ display:flex; }
+
+  .envelope-scene{
+    width: 100%;
+    max-width: 680px;
+    perspective: 1400px;
+  }
+
+  .envelope{
+    position:relative;
+    background: var(--cream);
+    border-radius: 4px;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.4);
+    overflow: visible;
+    border: 6px solid var(--cream);
+    outline: 2px solid var(--airmail-blue);
+    outline-offset: -12px;
+  }
+
+  .airmail-border{
+    position:absolute; inset:0;
+    border-radius:4px;
+    pointer-events:none;
+    background:
+      repeating-linear-gradient(45deg, var(--airmail-red) 0 14px, var(--airmail-blue) 14px 28px, transparent 28px 30px, transparent 30px 44px) top / 100% 10px no-repeat,
+      repeating-linear-gradient(45deg, var(--airmail-red) 0 14px, var(--airmail-blue) 14px 28px, transparent 28px 30px, transparent 30px 44px) bottom / 100% 10px no-repeat,
+      repeating-linear-gradient(45deg, var(--airmail-red) 0 14px, var(--airmail-blue) 14px 28px, transparent 28px 30px, transparent 30px 44px) left / 10px 100% no-repeat,
+      repeating-linear-gradient(45deg, var(--airmail-red) 0 14px, var(--airmail-blue) 14px 28px, transparent 28px 30px, transparent 30px 44px) right / 10px 100% no-repeat;
+  }
+
+  .envelope-body{
+    position:relative;
+    min-height: 220px;
+    padding: 30px 26px 26px;
+  }
+
+  .postmark{
+    position:absolute;
+    top: 18px; right: 22px;
+    width: 78px; height:78px;
+    border: 2.5px solid var(--airmail-blue);
+    border-radius:50%;
+    display:flex; align-items:center; justify-content:center;
+    text-align:center;
+    transform: rotate(-14deg);
+    font-family:'Special Elite', monospace;
+    font-size: 9px;
+    color: var(--airmail-blue);
+    line-height:1.3;
+    opacity: 0.85;
+  }
+
+  .seal{
+    width: 62px; height:62px;
+    border-radius:50%;
+    background: radial-gradient(circle at 35% 30%, #F3CCEB, var(--airmail-red) 70%);
+    margin: 0 auto;
+    display:flex; align-items:center; justify-content:center;
+    color:#fff2e0;
+    font-family:'Homemade Apple', cursive;
+    font-size: 22px;
+    box-shadow: 0 3px 6px rgba(0,0,0,0.35), inset 0 -3px 6px rgba(0,0,0,0.25);
+    cursor:pointer;
+    transition: transform .3s ease;
+  }
+  .seal:hover{ transform: scale(1.05); }
+
+  .tap-hint{
+    text-align:center;
+    font-family:'Special Elite', monospace;
+    font-size: 11px;
+    color: var(--ink-soft);
+    margin-top: 14px;
+    letter-spacing: 0.5px;
+  }
+
+  .letter-paper{
+    display:none;
+    background: var(--cream-2);
+    background-image: repeating-linear-gradient(180deg, transparent 0 31px, rgba(60,40,20,0.06) 31px 32px);
+    border-radius: 3px;
+    padding: 34px 40px 34px;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.4);
+    max-height: 82vh;
+    overflow-y: auto;
+    position:relative;
+  }
+  .letter-paper.show{ display:block; animation: rise .45s ease; }
+
+  @keyframes rise{
+    from{ transform: translateY(24px); opacity:0; }
+    to{ transform: translateY(0); opacity:1; }
+  }
+
+  .letter-head{
+    display:flex;
+    justify-content:space-between;
+    align-items:baseline;
+    font-family:'Special Elite', monospace;
+    font-size: 11px;
+    color: var(--ink-soft);
+    letter-spacing: 0.5px;
+    margin-bottom: 18px;
+    border-bottom: 1px dashed var(--kraft-darker);
+    padding-bottom: 10px;
+  }
+
+  .letter-greeting{
+    font-family:'Homemade Apple', cursive;
+    font-size: 30px;
+    color: var(--airmail-blue);
+    margin: 0 0 14px;
+  }
+
+  .letter-body{
+    font-family:'EB Garamond', serif;
+    font-size: 19px;
+    line-height: 1.7;
+    color: var(--ink);
+    white-space: pre-line;
+  }
+
+  .letter-sign{
+    font-family:'Homemade Apple', cursive;
+    font-size: 26px;
+    color: var(--airmail-blue);
+    text-align:right;
+    margin-top: 20px;
+  }
+
+  .letter-photo-frame{
+    display:none;
+    max-width: 280px;
+    margin: 30px auto 6px;
+    background: #ffffff;
+    padding: 14px 14px 34px;
+    box-shadow: 0 10px 24px rgba(60,40,20,0.28);
+    transform: rotate(-2deg);
+    border: 1px solid rgba(0,0,0,0.06);
+  }
+  .letter-photo-frame.show{ display:block; }
+  .letter-photo-frame img{
+    display:block;
+    width:100%;
+    height:auto;
+    max-height: 320px;
+    object-fit: cover;
+    background: var(--kraft);
+  }
+  .letter-photo-caption{
+    font-family:'Homemade Apple', cursive;
+    font-size: 18px;
+    color: var(--ink-soft);
+    text-align:center;
+    margin-top: 8px;
+  }
+
+  .close-btn{
+    position:absolute;
+    top: 10px; right: 14px;
+    background:none; border:none;
+    font-family:'Special Elite', monospace;
+    font-size: 13px;
+    color: var(--ink-soft);
+    cursor:pointer;
+    letter-spacing:1px;
+  }
+  .close-btn:hover{ color: var(--airmail-red); }
+
+  @media (prefers-reduced-motion: reduce){
+    .letter-paper.show, .seal{ animation:none; transition:none; }
+  }
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <span class="eyebrow">July 15 &mdash; August 3, 2026</span>
+    <h1>One letter a day</h1>
+    <p class="subtitle">One letter for every day until I get to see you again.</p>
+    <div class="countdown" id="countdown"></div>
+  </header>
+
+  <div class="album">
+    <div class="grid" id="grid"></div>
+  </div>
+
+  <footer class="note">Tap an opened stamp anytime &mdash; every letter stays for you to read again. &nbsp;💌</footer>
+</div>
+
+<div class="overlay" id="overlay">
+  <div class="envelope-scene">
+    <div class="envelope" id="envelope">
+      <div class="airmail-border"></div>
+      <div class="envelope-body">
+        <div class="postmark" id="postmark"></div>
+        <div class="seal" id="seal" title="Break the seal">💌</div>
+        <div class="tap-hint">tap the seal to open</div>
+      </div>
+    </div>
+    <div class="letter-paper" id="letterPaper">
+      <button class="close-btn" id="closeBtn">CLOSE ✕</button>
+      <div class="letter-head" id="letterHead"></div>
+      <div class="letter-greeting" id="letterGreeting"></div>
+      <div class="letter-body" id="letterBody"></div>
+      <div class="letter-sign" id="letterSign"></div>
+      <div class="letter-photo-frame" id="letterPhotoFrame">
+        <img id="letterPhotoImg" src="" alt="a photo for this day">
+        <div class="letter-photo-caption" id="letterPhotoCaption"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ======================================================================
+   CUSTOMIZE ME:
+   - HER_NAME: what you call her
+   - YOUR_SIGNOFF: how you sign each letter
+   - LETTERS: 20 messages, Day 1 (Jul 15) through Day 20 (Aug 3).
+     Edit the "body" text freely — this is just a starting draft.
+
+     To attach a photo to a letter, add an "image" field with a path
+     or URL, e.g.:
+       { body: `...`, image: "photos/day1.jpg" }
+     Put your image files in a "photos" folder next to this HTML file
+     (or use any image URL). Add an optional "caption" too if you want
+     a little handwritten note under the photo:
+       { body: `...`, image: "photos/day1.jpg", caption: "us, day one" }
+     Leave "image" out entirely for letters with no photo.
+   ====================================================================== */
+const HER_NAME = "Thea Milove";
+const YOUR_SIGNOFF = "Syrel";
+
+const START_DATE = new Date(2026, 6, 15); // July 15, 2026 (month is 0-indexed)
+const TOTAL_DAYS = 20; // through Aug 3, 2026
+
+const LETTERS = [
+  { body: `Hello love
+
+Our first days together were honestly some of the most fun days we've ever had. We were just happy all the time and we laughed over the smallest things. Nothing else really mattered it was just you and me. We didn't really know much about each other yet but we still loved each other so much. We were still learning about each other and everything felt so exciting because every little thing was something new
+
+I still remember how awkward we were sometimes but somehow that just made everything even better. We'd laugh at random things and talk about whatever came to our minds. There wasn't really anything to worry about we were just enjoying being together and that's all that mattered. Those are memories I'll always keep with me because they were some of the happiest moments of my life
+
+I know those are the kinds of days you miss and honestly I do too. We never really argued back then and everything just felt so simple. We didn't have all these misunderstandings or overthink things we just enjoyed each other's company. Sometimes I wish we could visit those moments again just to experience them one more time
+
+But even if I miss those days I don't miss them because I want to go back. I miss them because they were the start of us. Since then we've been through so much together. We know so much more about each other now. We know what makes each other smile and we also know what hurts. We've seen each other at our best and at our worst and even after all of that I'm still here choosing you
+
+I know things aren't as simple as they used to be. Sometimes it feels like we're closer than ever but somehow farther apart at the same time. I know we've had our arguments and we've both made mistakes but I don't think that means our love got weaker. If anything I think it became stronger because it's easy to love someone when everything is perfect but it's different when you choose to stay even when things get hard
+
+Please know that my love for you is so much deeper than it was back then. Back then I loved you because everything was new and exciting. Now I love you because I know you. I know your good sides and your flaws. I know the things you don't like about yourself and the things that make you overthink. I know the real you and I still choose you every single day
+
+Those first days will always have a special place in my heart because that's where our story started but I don't think I'd trade what we have now for what we had back then. We've grown together and we've made so many memories since then. Even the hard moments became a part of our story and I wouldn't erase them because they helped us become who we are today
+
+So if you ever think that I loved you more back then I hope you know that's not true at all. My love for you is deeper much much deeper than the days before and every day it just keeps growing. I don't know how it's possible but somehow I keep finding more reasons to love you and I hope I never stop`,
+  image: "IMG_20241214_193350.jpg", caption: "us, day one"  },
+
+  { body: `N/A`,
+    image: "N/A", caption: "N/A"  },
+
+  { body: `N/A.`,
+    image: "N/A", caption: "N/A"},
+
+  { body: `N/A`,
+    image: "N/A", caption: "N/A" },
+
+  { body: `N/A`, 
+    image: "N/A", caption: "N/A" },
+
+  { body: `N/A`, 
+    image: "N/A", caption: "N/A" },
+
+  { body: `N/A`, 
+    image: "N/A", caption: "N/A" },
+
+  { body: `N/A`, 
+    image: "N/A", caption: "N/A" },
+
+  { body: `N/A`, 
+    image: "N/A", caption: "N/A" },
+
+  { body: `N/A`, 
+    image: "N/A", caption: "N/A" },
+
+  { body: `N/A`, 
+    image: "N/A", caption: "N/A" },
+
+  { body: `N/A`, 
+    image: "N/A", caption: "N/A" },
+
+  { body: `N/A`, 
+    image: "N/A", caption: "N/A" },
+
+  { body: `N/A`, 
+    image: "N/A", caption: "N/A" },
+
+  { body: `N/A`, 
+    image: "N/A", caption: "N/A" },
+
+  { body: `N/A`, 
+    image: "N/A", caption: "N/A" },
+
+  { body: `N/A`, 
+    image: "N/A", caption: "N/A" },
+
+  { body: `N/A`, 
+    image: "N/A", caption: "N/A" },
+
+  { body: `N/A`, 
+    image: "N/A", caption: "N/A" },
+    
+  { body: `N/A`, 
+    image: "N/A", caption: "N/A" },
+];
+
+function fmtDate(d){
+  return d.toLocaleDateString('en-US', { month:'short', day:'numeric', year:'numeric' });
+}
+function startOfDay(d){
+  return new Date(d.getFullYear(), d.getMonth(), d.getDate());
+}
+function addDays(d, n){
+  const r = new Date(d);
+  r.setDate(r.getDate() + n);
+  return r;
+}
+
+const today = startOfDay(new Date());
+const grid = document.getElementById('grid');
+const countdownEl = document.getElementById('countdown');
+
+const lastDay = addDays(START_DATE, TOTAL_DAYS - 1);
+const daysLeft = Math.max(0, Math.round((lastDay - today) / 86400000));
+countdownEl.innerHTML = daysLeft > 0
+  ? `<b>${daysLeft}</b> day${daysLeft===1?'':'s'} until we meet &mdash; August 3, 2026`
+  : `<b>Today's the day</b> &mdash; August 3, 2026`;
+
+for(let i = 0; i < TOTAL_DAYS; i++){
+  const dayDate = addDays(START_DATE, i);
+  const isUnlocked = today >= dayDate;
+  const isToday = today.getTime() === dayDate.getTime();
+  const isFinal = i === TOTAL_DAYS - 1;
+
+  const stamp = document.createElement('div');
+  stamp.className = `stamp ${isUnlocked ? 'unlocked' : 'locked'} ${isToday ? 'today' : ''} ${isFinal ? 'final-day' : ''}`;
+
+  if(isUnlocked){
+    stamp.innerHTML = `
+      <span class="corner c-tl"></span><span class="corner c-tr"></span>
+      <span class="corner c-bl"></span><span class="corner c-br"></span>
+      <div class="day-num">${i+1}</div>
+      <div class="day-date">${fmtDate(dayDate)}</div>
+    `;
+    stamp.addEventListener('click', () => openEnvelope(i, dayDate));
+  } else {
+    stamp.innerHTML = `
+      <div class="lock-icon">🔒</div>
+      <div class="day-num">${i+1}</div>
+      <div class="day-date">${fmtDate(dayDate)}</div>
+    `;
+  }
+  grid.appendChild(stamp);
+}
+
+const overlay = document.getElementById('overlay');
+const envelope = document.getElementById('envelope');
+const seal = document.getElementById('seal');
+const letterPaper = document.getElementById('letterPaper');
+const postmark = document.getElementById('postmark');
+const letterHead = document.getElementById('letterHead');
+const letterGreeting = document.getElementById('letterGreeting');
+const letterBody = document.getElementById('letterBody');
+const letterSign = document.getElementById('letterSign');
+const letterPhotoFrame = document.getElementById('letterPhotoFrame');
+const letterPhotoImg = document.getElementById('letterPhotoImg');
+const letterPhotoCaption = document.getElementById('letterPhotoCaption');
+const closeBtn = document.getElementById('closeBtn');
+
+function openEnvelope(index, dayDate){
+  const letter = LETTERS[index];
+  postmark.innerHTML = `DAY ${index+1}<br>${fmtDate(dayDate).toUpperCase()}`;
+  letterHead.innerHTML = `<span>DAY ${index+1} OF ${TOTAL_DAYS}</span><span>${fmtDate(dayDate)}</span>`;
+  letterGreeting.textContent = `Dear ${HER_NAME},`;
+  letterBody.textContent = letter.body;
+  letterSign.textContent = `Love, ${YOUR_SIGNOFF}`;
+
+  if(letter.image){
+    letterPhotoImg.src = letter.image;
+    letterPhotoCaption.textContent = letter.caption || '';
+    letterPhotoFrame.classList.add('show');
+  } else {
+    letterPhotoFrame.classList.remove('show');
+    letterPhotoImg.src = '';
+    letterPhotoCaption.textContent = '';
+  }
+
+  envelope.style.display = '';
+  letterPaper.classList.remove('show');
+  overlay.classList.add('show');
+
+  seal.onclick = () => {
+    envelope.style.display = 'none';
+    letterPaper.classList.add('show');
+  };
+}
+
+closeBtn.addEventListener('click', () => overlay.classList.remove('show'));
+overlay.addEventListener('click', (e) => {
+  if(e.target === overlay) overlay.classList.remove('show');
+});
+document.addEventListener('keydown', (e) => {
+  if(e.key === 'Escape') overlay.classList.remove('show');
+});
+</script>
+
+</body>
+</html>
